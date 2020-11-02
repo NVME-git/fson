@@ -1,2 +1,2 @@
 # FSON
-Functionally structured object notation.
+Function structured object notation.
