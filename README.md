@@ -1,2 +1,2 @@
-# fson
- Compile functional code into a single file
+# FSON
+Functionally structured object notation.
