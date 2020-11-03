@@ -23,7 +23,7 @@ def three_fs(prop):
     return folder_path, file, function
 
 
-def fson(folder, file, function, fsrc='fsrc', ext='py', tab_length=4):
+def fson(folder, file, function, fsrc='fson_files', ext='py', tab_length=4):
     if not os.path.exists(f"{fsrc}"):
         os.makedirs(f"{fsrc}")
 
@@ -35,22 +35,33 @@ def fson(folder, file, function, fsrc='fsrc', ext='py', tab_length=4):
     states = ['#####','#---#', '#&&&#','#+++#']
 
     state = states[0]
+    in_function = False
     for i in range(len(lines)):
 
         line = lines[i].rstrip()
         line = line.replace('\t', tab_length*' ')
 
         if (len(line) >= 5) and (line[:5] in states):
+            # Check if in the correct function
+            # If given function 
+            line_function = line.split(' ')[-1]
+            line_state = line.split(' ')[0]
+            if (line_state == states[0]) and (line_function == function):
+                in_function = True
+            if (line_state == states[0]) and (line_function != function):
+                continue
+
             # Handle states with attributes here
             # eg. #+++# helpers read type_1
             state = line[:5]
 
             if (state == '#+++#') and (line[-3:] != 'end'):
                 # Add expansion code here
-                print(i, line)
+                # print(i, line)
                 funcfolder, funcfile, funcfunction = three_fs(line)
                 funcpath = f"{fsrc}/{funcfolder}/{funcfile}_{funcfunction}.{ext}"
-                print(f"<--- {funcpath}")
+                # print(f"<--- {funcpath}")
+                print(f"<--- {funcfile}_{funcfunction}.{ext}")
                 with open(funcpath,"r") as f:
                     funclines = f.readlines()
                 for funcline in funclines:
@@ -59,13 +70,13 @@ def fson(folder, file, function, fsrc='fsrc', ext='py', tab_length=4):
         if (state == states[0]) and (line[-3:] == 'end'):
             break
 
-        if state == '#&&&#':
+        if in_function and (state == '#&&&#'):
             if file != function: line = line[tab_length:]
             funcode.append(line+'\n')
 
-        if state in simple_states:
-            print(i, state)
-    
+            # if state in simple_states:
+            #     print(i, state)
+
     # Remove duplicate file name content for main function files.
     if file == function:
         func_file = f"{fsrc}/{folder}/{file}.{ext}"
@@ -85,7 +96,7 @@ def main():
     for prop in props_list:
         folder, file, function = three_fs(prop)
 
-        print(f"{folder}/{file}.py -> {function}")
+        print(f"\n{folder}/{file}.py ---> {function}")
         fson(folder, file, function)
 
 if __name__ == '__main__':

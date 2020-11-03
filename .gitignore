@@ -1,5 +1,5 @@
 # fsrc directory is populated by running fson.py
-fsrc/*
+fson_files/*
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
