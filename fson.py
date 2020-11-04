@@ -33,27 +33,27 @@ def fson(folder, file, function, fsrc='fson_files', ext='py', tab_length=4):
 
     simple_states = ['#---#', '#&&&#'] 
     states = ['#####','#---#', '#&&&#','#+++#']
+    state_length = 5
 
     state = states[0]
-    in_function = False
+    found_function = False
     for i in range(len(lines)):
 
         line = lines[i].rstrip()
         line = line.replace('\t', tab_length*' ')
 
-        if (len(line) >= 5) and (line[:5] in states):
-            # Check if in the correct function
-            # If given function 
+        if (len(line) >= state_length) and (line[:state_length] in states):
+            # Check if found the correct function
             line_function = line.split(' ')[-1]
             line_state = line.split(' ')[0]
             if (line_state == states[0]) and (line_function == function):
-                in_function = True
+                found_function = True
             if (line_state == states[0]) and (line_function != function):
                 continue
 
             # Handle states with attributes here
             # eg. #+++# helpers read type_1
-            state = line[:5]
+            state = line_state
 
             if (state == '#+++#') and (line[-3:] != 'end'):
                 # Add expansion code here
@@ -70,7 +70,7 @@ def fson(folder, file, function, fsrc='fson_files', ext='py', tab_length=4):
         if (state == states[0]) and (line[-3:] == 'end'):
             break
 
-        if in_function and (state == '#&&&#'):
+        if found_function and (state == '#&&&#'):
             if file != function: line = line[tab_length:]
             funcode.append(line+'\n')
 
